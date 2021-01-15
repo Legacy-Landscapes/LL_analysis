@@ -11,7 +11,7 @@ library(ggfortify)
 
 
 #-#-# Get the final data frame (gridded PAs with values for all indicators) #-#-#
-setwd("/Users/alkevoskamp/Documents/Legacy Landscapes/Site selection analysis/Site selection output/Combined outputs/")
+setwd("/Users/alkevoskamp/Documents/Legacy Landscapes/Legacy_landscapes_analysis/LL_analysis/Processed_data/")
 PAdata <- read.csv("Final_dataset_IUCN_WHS_KBA_18_12.csv")
 
 
