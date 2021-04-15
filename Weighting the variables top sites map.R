@@ -1,9 +1,10 @@
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-#   Spatial distribution of top sites based on individual objectives  #
-#        Map per realm top 5 sites per conservation objective         #
-#                       Figure 3 main manuscript                      #
-#                           Alke March 2021                           #
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
+#   Spatial distribution of top sites based on individual objectives    #
+#           flexible for diffrent conservation scenarioes               #
+#        Map per realm top 5 sites per conservation objective           #
+#                       Figure 3 main manuscript                        #
+#                           Alke March 2021                             #
+#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
 
 
 #-#-# Clear memory #-#-#
