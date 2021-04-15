@@ -328,5 +328,5 @@ plot(CombGlobal)
 
 
 #-#-# Save the final PCA plot #-#-#
-setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/LL_analysis/Result_plots/")
+setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
 ggsave("PCA Legacy Landscapes Conservation Objectives.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
