@@ -17,7 +17,7 @@ library(e1071)
 
 
 #-#-# Get the final data frame (gridded PAs with values for all indicators) #-#-#
-setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Site selection analysis/Site selection output/Combined outputs/")
+setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/LL_analysis/Processed_data/")
 PAdata <- read.csv("Final_dataset_IUCN_WHS_KBA_18_12.csv")
 Outpath <- "/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/LL_analysis/Processed_data/Scaled_variables/"
 
@@ -170,63 +170,4 @@ ScaleData <- lapply(RealmNr,function(x){
   #-#-# Write final dataframe #-#-#
   write.csv(AggData,paste0(Outpath,"Final_dataset_IUCN_WHS_KBA_for_weighting_",Rname,".csv"))
 })
-
-
-
-
-## Delete from here - new script?
-
-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# Weightig the different objectives #-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#
-
-#-#-# Get the final dataframe with the scaled objectives #-#-#
-setwd("/Users/alkevoskamp/Documents/LL shiny app/Updated datatables/")
-BaseData <- read.csv("Final_dataset_IUCN_WHS_KBA_for_weighting_Indomalaya.csv")
-head(BaseData)
-
-WeightTable <- BaseData[c("Int_Name","Biodiversity","ClimateStability","LandUseStability","Wilderness","Area","ClimateProtection")]
-head(WeightTable)
-
-## Check min and max again
-for(i in 2:ncol(WeightTable)){
-  print(max(na.omit(WeightTable[,i])))
-}
-
-for(i in 2:ncol(WeightTable)){
-  print(min(na.omit(WeightTable[,i])))
-}
-
-
-#-#-# Weigh by different objectives #-#-# 
-#-#-# This is what the app does #-#-#
-## Weights need to sum up to 1
-WBio <- 0.4
-WWild <- 0.2
-WClimStab <- 0.05
-WLUStab <- 0.05
-WArea <- 0.2
-WClimPro <- 0.1
-
-Weights <- as.vector(c(WBio,WClimStab,WLUStab,WWild,WArea,WClimPro))
-
-## Weigh the differnt conservation objectives
-Data <- as.matrix(WeightTable[2:7])
-Rank <- rowWeightedMeans(Data, w = Weights, na.rm = TRUE)
-WeightTable$Rank <- Rank
-
-head(WeightTable)
-str(WeightTable)
-
-## Order to get the to 20 sites
-WeightTable <- WeightTable[order(WeightTable$Rank, decreasing = TRUE),] 
-#WeightTable20 <- WeightTable[1:20,]
-max(na.omit(WeightTable$Rank))
-min(na.omit(WeightTable$Rank))
-head(WeightTable)
-head(WeightTable20)
-
-## Save the ranking 
-write.csv(WeightTable,"Ranking_indomalaya_4Bio_2Wild_05ClimSt_05LUStab_2Size_1ClimP.csv")
-#write.csv(WeightTable20,"Ranking_palearctic_top20_100_ClimProt.csv")
-
-
 
