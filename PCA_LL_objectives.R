@@ -24,7 +24,7 @@ library(gridExtra)
 
 #-#-# Load the data frame containing values for a sites included in the analysis #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/LL_analysis/Processed_data/")
-PAdata <- read.csv("Final_dataset_IUCN_WHS_KBA_18_12.csv")
+PAdata <- read.csv("Final_dataset_IUCN_WHS_KBA_18_12_replicates_removed.csv")
 
 
 #-#-# Format the dataframe for the analysis #-#-#
@@ -41,7 +41,7 @@ ncol(PAdataS)
 PAdataS <- subset(PAdataS, RealmNr == "1" | RealmNr == "3" | RealmNr == "4" | RealmNr == "5" | RealmNr == "6" | RealmNr == "8")
 as.numeric(as.character(PAdataS$RealmNr))
 PAdataS$RealmName <- 0
-PAdataS$RealmName[PAdataS$RealmNr == 1] <- "Australasian"
+PAdataS$RealmName[PAdataS$RealmNr == 1] <- "Australasia"
 PAdataS$RealmName[PAdataS$RealmNr == 3] <- "Afrotropic"
 PAdataS$RealmName[PAdataS$RealmNr == 4] <- "Indomalaya"
 PAdataS$RealmName[PAdataS$RealmNr == 5] <- "Nearctic"
@@ -122,18 +122,65 @@ str(PA.pca.cl)
 ## Explained variance of components 
 fviz_eig(PA.pca.cl)
 
-## PCA scatter plot showing the data points
+#---# Global PCA scatterplot coloured by realm for manuscript (Fig. 2) #---#
+pal <- colorRampPalette(c("steelblue3","orange3","navajowhite3","darkolivegreen3","plum4","brown"))
+colour <- pal(6)
+
 GlobalScatter <- fviz_pca_ind(PA.pca.cl, pointsize = 4,
                               label="none", 
                               habillage=PCAdata$Realm,
-                              palette="Dark2") +
-  theme(legend.position = "none") +
-  theme(text = element_text(size = 28),
-        axis.title = element_text(size = 28),
-        axis.text = element_text(size = 28),
-        plot.title = element_text(size = 34)) +
-  ggtitle("")
+                              palette=colour,
+                              alpha = 0.6) +
+  scale_shape_manual(values=c(18,18,18,18,18,18)) +
+  theme(legend.position = "right") +
+  theme(text = element_text(size = 22),
+        axis.title = element_text(size = 18),
+        axis.text = element_text(size = 18),
+        plot.title = element_text(size = 25)) +
+  ggtitle("Individual sites - PCA")
 plot(GlobalScatter)
+
+
+#-#_# Simple realm map #-#-#
+## Set the file paths 
+realmpath <- "/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Site selection analysis/Other files/Realms and Regions/CMEC regions & realms/WWF_Realms_gridded_05.Rdata"
+
+realmmap <- get(load(realmpath))
+head(realmmap)
+realmmap <- na.omit(realmmap)
+realmmap <- subset(realmmap, !(RealmWWF == 2))
+realmmap <- subset(realmmap, !(RealmWWF == 7))
+
+colours <- c("steelblue3","orange3","navajowhite3","darkolivegreen3","plum4","brown")
+
+realms <- ggplot(realmmap) +
+  geom_raster(aes( x = x, y = y, fill = as.factor(RealmWWF), alpha = 0.2)) +
+  scale_fill_manual("Realm",values = colours) +
+  coord_sf(xlim = c(-170, 180), ylim = c(90, -60), expand = FALSE) +
+  theme(legend.position = "none") +
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        plot.title = element_text(size = 25))+
+  theme(panel.background=element_rect(fill='white',colour="white"))+ # Remove the background
+  labs(x="", y="", title="") + # Remove axis titles
+  guides(colour = guide_legend(override.aes = list(size = 8))) +
+  ggtitle("Biogeographic realms")
+plot(realms) 
+
+
+#-#-# Combine the PCA sactter plot and the realmmap #-#-#  
+CombScatter <- arrangeGrob(realms,GlobalScatter,
+                          widths = c(2,2),
+                          heights = c(1.5,1),
+                          ncol = 2,
+                          nrow = 2)
+plot(CombScatter)
+
+
+#-#-# Save the final PCA plot #-#-#
+setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
+ggsave("PCA Legacy Landscapes scatter realms.tiff",CombScatter,width=25, height=10, unit="in", dpi=300, bg="white")
+
 
 
 #---# Nearctic PCA #---#
@@ -169,7 +216,7 @@ summary(Afrotropic.pca)
 str(Afrotropic.pca)
 
 #---# Australasia PCA #---#
-Australasia_data <- subset(PCAdata,Realm =="Australasian")
+Australasia_data <- subset(PCAdata,Realm =="Australasia")
 
 ## Scale variables and compute PCA
 Australasia.pca <- prcomp(Australasia_data[c(4:16)],center=T,scale=T) 
