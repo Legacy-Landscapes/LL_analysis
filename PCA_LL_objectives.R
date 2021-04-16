@@ -136,7 +136,7 @@ GlobalScatter <- fviz_pca_ind(PA.pca.cl, pointsize = 4,
   theme(text = element_text(size = 22),
         axis.title = element_text(size = 18),
         axis.text = element_text(size = 18),
-        plot.title = element_text(size = 25)) +
+        plot.title = element_text(size = 25, face="bold")) +
   ggtitle("Individual sites - PCA")
 plot(GlobalScatter)
 
@@ -161,7 +161,8 @@ realms <- ggplot(realmmap) +
   theme(axis.text=element_blank(),
         axis.ticks=element_blank(),
         plot.title = element_text(size = 25))+
-  theme(panel.background=element_rect(fill='white',colour="white"))+ # Remove the background
+  theme(panel.background=element_rect(fill='white',colour="white"), # Remove the background
+        plot.title = element_text(size = 22, face="bold")) + 
   labs(x="", y="", title="") + # Remove axis titles
   guides(colour = guide_legend(override.aes = list(size = 8))) +
   ggtitle("Biogeographic realms")
