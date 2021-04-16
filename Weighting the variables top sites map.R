@@ -45,7 +45,7 @@ Wild_WClimPro <- 0
 
 Wild_weights <- as.data.frame(rbind(Wild_WBio,Wild_WClimStab,Wild_WLUStab,Wild_WWild,Wild_WArea,Wild_WClimPro))
 
-#---# Combination only #---#
+#---# Combination only (LL example) #---#
 Comb_WBio <- 0.25
 Comb_WWild <- 0.25
 Comb_WClimStab <- 0.1
