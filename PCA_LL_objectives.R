@@ -136,7 +136,7 @@ GlobalScatter <- fviz_pca_ind(PA.pca.cl, pointsize = 4,
   theme(text = element_text(size = 22),
         axis.title = element_text(size = 18),
         axis.text = element_text(size = 18),
-        plot.title = element_text(size = 25, face="bold")) +
+        plot.title = element_text(size = 22, face="bold")) +
   ggtitle("Individual sites - PCA")
 plot(GlobalScatter)
 
