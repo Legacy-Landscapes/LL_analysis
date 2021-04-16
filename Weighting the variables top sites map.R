@@ -406,7 +406,7 @@ colours <- c("steelblue3","orange3","navajowhite3","darkolivegreen3","plum4","br
 map <- ggplot(selected_sites) +
   geom_raster(data = realmmap, aes( x = x, y = y, fill = as.factor(RealmName), alpha = 0.2)) +
   scale_fill_manual("Realm",values = colours) +
-  geom_sf(data = worldmap, fill = NA, color = "grey60", size = 0.2) +
+  geom_sf(data = worldmap, fill = NA, color = "grey40", size = 0.2) +
   coord_sf(xlim = c(-170, 180), ylim = c(90, -60), expand = FALSE) +
   geom_point(data = selected_sites,
              aes(x = x, y = y, color = Scenario),
