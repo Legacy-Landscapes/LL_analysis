@@ -178,7 +178,7 @@ CombScatter <- arrangeGrob(realms,GlobalScatter,
 plot(CombScatter)
 
 
-#-#-# Save the final PCA plot #-#-#
+#-#-# Save the final PCA scatter plot #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
 ggsave("PCA Legacy Landscapes scatter realms.tiff",CombScatter,width=25, height=10, unit="in", dpi=300, bg="white")
 
@@ -378,3 +378,85 @@ plot(CombGlobal)
 #-#-# Save the final PCA plot #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
 ggsave("PCA Legacy Landscapes Conservation Objectives.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
+
+
+#---# Supplemantary plot - Scree plots #---#
+Glob_scree <- fviz_eig(PA.pca.cl, choice = "variance",  #"eigenvalue"
+                       geom = c("line"),
+                       ggtheme = theme_minimal()) +
+                       theme(axis.title = element_blank(),
+                             axis.text = element_text(size = 16),
+                             plot.title = element_text(size = 22, face="bold")) +
+                         ggtitle("Global")
+plot(Glob_scree)
+
+Nearctic_scree <- fviz_eig(Nearctic.pca, choice = "variance",
+                       geom = c("line"),
+                       ggtheme = theme_minimal()) +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(size = 22, face="bold")) +
+  ggtitle("Nearctic")
+plot(Nearctic_scree)
+
+Palearctic_scree <- fviz_eig(Palearctic.pca, choice = "variance",  
+                           geom = c("line"),
+                           ggtheme = theme_minimal()) +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(size = 22, face="bold")) +
+  ggtitle("Palearctic")
+plot(Palearctic_scree)
+
+Indomalaya_scree <- fviz_eig(Indomalaya.pca, choice = "variance", 
+                             geom = c("line"),
+                             ggtheme = theme_minimal()) +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(size = 22, face="bold")) +
+  ggtitle("Indomalaya")
+plot(Indomalaya_scree)
+
+Neotropic_scree <- fviz_eig(Neotropic.pca, choice = "variance", 
+                             geom = c("line"),
+                             ggtheme = theme_minimal()) +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(size = 22, face="bold")) +
+  ggtitle("Neotropic")
+plot(Neotropic_scree)
+
+Afrotropic_scree <- fviz_eig(Afrotropic.pca, choice = "variance", 
+                            geom = c("line"),
+                            ggtheme = theme_minimal()) +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(size = 22, face="bold")) +
+  ggtitle("Afrotropic")
+plot(Afrotropic_scree)
+
+Australasia_scree <- fviz_eig(Australasia.pca, choice = "variance",
+                             geom = c("line"),
+                             ggtheme = theme_minimal()) +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 16),
+        plot.title = element_text(size = 22, face="bold")) +
+  ggtitle("Australasia")
+plot(Australasia_scree)
+
+Blank <- ggplot() + theme_void()
+
+#-#-# Combine the PCA plots and the legend #-#-#  
+CombScree <- arrangeGrob(Glob_scree,Nearctic_scree,Palearctic_scree,Indomalaya_scree,Blank,Neotropic_scree,Afrotropic_scree,Australasia_scree,
+                          widths = c(1,1,1,1),
+                          heights = c(1,1),
+                          ncol = 4,
+                          nrow = 2,
+                          bottom = textGrob("Dimensions", hjust = 1, gp = gpar(fontface = "bold", cex = 2)),
+                          left = textGrob("Percentage of explained variances", rot = 90, vjust = 1, gp = gpar(fontface = "bold", cex = 2)))
+plot(CombScree)
+
+
+#-#-# Save the final PCA plot #-#-#
+setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
+ggsave("Spp Legacy Landscapes PCA scree plot.tiff",CombScree,width=25, height=12, unit="in", dpi=300, bg="white")
