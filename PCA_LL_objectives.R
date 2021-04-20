@@ -380,7 +380,34 @@ setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_lands
 ggsave("PCA Legacy Landscapes Conservation Objectives.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
 
 
-#---# Supplemantary plot - Scree plots #---#
+#--------------------     # Supplemantary plot - Scree plots #---------------------------------#
+#-#_# Simple realm map #-#-#
+## Set the file paths 
+realmpath <- "/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Site selection analysis/Other files/Realms and Regions/CMEC regions & realms/WWF_Realms_gridded_05.Rdata"
+
+realmmap <- get(load(realmpath))
+head(realmmap)
+realmmap <- na.omit(realmmap)
+realmmap <- subset(realmmap, !(RealmWWF == 2))
+realmmap <- subset(realmmap, !(RealmWWF == 7))
+
+colours <- c("steelblue3","orange3","navajowhite3","darkolivegreen3","plum4","brown")
+
+realms <- ggplot(realmmap) +
+  geom_raster(aes( x = x, y = y, fill = as.factor(RealmWWF), alpha = 0.2)) +
+  scale_fill_manual("Realm",values = colours) +
+  coord_sf(xlim = c(-170, 180), ylim = c(90, -60), expand = FALSE) +
+  theme(legend.position = "none") +
+  theme(axis.text=element_blank(),
+        axis.ticks=element_blank(),
+        plot.title = element_text(size = 25))+
+  theme(panel.background=element_rect(fill='white',colour="white"), # Remove the background
+        plot.title = element_text(size = 22, hjust = 0.5)) + 
+  labs(x="", y="", title="") + # Remove axis titles
+  guides(colour = guide_legend(override.aes = list(size = 8))) +
+  ggtitle("Biogeographic realms")
+plot(realms) 
+
 Glob_scree <- fviz_eig(PA.pca.cl, choice = "variance",  #"eigenvalue"
                        geom = c("line"),
                        ggtheme = theme_minimal()) +
@@ -392,6 +419,7 @@ plot(Glob_scree)
 
 Nearctic_scree <- fviz_eig(Nearctic.pca, choice = "variance",
                        geom = c("line"),
+                       linecolor = "darkolivegreen3",
                        ggtheme = theme_minimal()) +
   theme(axis.title = element_blank(),
         axis.text = element_text(size = 16),
@@ -401,6 +429,7 @@ plot(Nearctic_scree)
 
 Palearctic_scree <- fviz_eig(Palearctic.pca, choice = "variance",  
                            geom = c("line"),
+                           linecolor = "brown",
                            ggtheme = theme_minimal()) +
   theme(axis.title = element_blank(),
         axis.text = element_text(size = 16),
@@ -410,6 +439,7 @@ plot(Palearctic_scree)
 
 Indomalaya_scree <- fviz_eig(Indomalaya.pca, choice = "variance", 
                              geom = c("line"),
+                             linecolor = "navajowhite3",
                              ggtheme = theme_minimal()) +
   theme(axis.title = element_blank(),
         axis.text = element_text(size = 16),
@@ -419,6 +449,7 @@ plot(Indomalaya_scree)
 
 Neotropic_scree <- fviz_eig(Neotropic.pca, choice = "variance", 
                              geom = c("line"),
+                             linecolor = "plum4",
                              ggtheme = theme_minimal()) +
   theme(axis.title = element_blank(),
         axis.text = element_text(size = 16),
@@ -428,6 +459,7 @@ plot(Neotropic_scree)
 
 Afrotropic_scree <- fviz_eig(Afrotropic.pca, choice = "variance", 
                             geom = c("line"),
+                            linecolor = "orange3",
                             ggtheme = theme_minimal()) +
   theme(axis.title = element_blank(),
         axis.text = element_text(size = 16),
@@ -437,6 +469,7 @@ plot(Afrotropic_scree)
 
 Australasia_scree <- fviz_eig(Australasia.pca, choice = "variance",
                              geom = c("line"),
+                             linecolor = "steelblue3",
                              ggtheme = theme_minimal()) +
   theme(axis.title = element_blank(),
         axis.text = element_text(size = 16),
@@ -444,10 +477,10 @@ Australasia_scree <- fviz_eig(Australasia.pca, choice = "variance",
   ggtitle("Australasia")
 plot(Australasia_scree)
 
-Blank <- ggplot() + theme_void()
+#Blank <- ggplot() + theme_void() # Use blank plot instead of realm map
 
 #-#-# Combine the PCA plots and the legend #-#-#  
-CombScree <- arrangeGrob(Glob_scree,Nearctic_scree,Palearctic_scree,Indomalaya_scree,Blank,Neotropic_scree,Afrotropic_scree,Australasia_scree,
+CombScree <- arrangeGrob(Glob_scree,Nearctic_scree,Palearctic_scree,Indomalaya_scree,realms,Neotropic_scree,Afrotropic_scree,Australasia_scree,
                           widths = c(1,1,1,1),
                           heights = c(1,1),
                           ncol = 4,
@@ -459,4 +492,4 @@ plot(CombScree)
 
 #-#-# Save the final PCA plot #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
-ggsave("Spp Legacy Landscapes PCA scree plot.tiff",CombScree,width=25, height=12, unit="in", dpi=300, bg="white")
+ggsave("Spp Legacy Landscapes PCA scree plot colour.tiff",CombScree,width=25, height=12, unit="in", dpi=300, bg="white")
