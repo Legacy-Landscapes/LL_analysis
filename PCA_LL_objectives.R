@@ -329,31 +329,33 @@ g_legend<-function(a.gplot){
 }
 
 ## Create simple dataframe containing the list of variable names to be displayed in legend
-Variables <- c("High SR","High SE","High ED","High BII",
-          "Low HFP","Low BTAC","High CS","Low FCC","High LUS","High CaS",
-          "High VCaS","High ICaS","Large size")
+#c("High SR","High SE","High ED","High BII","Low HFP","Low BTAC","High CS",
+#  "Low FCC","High LUS","High CaS","High VCaS","High ICaS","Large size"))
+Variables <- c("High species richness","High species endemism","High evolutionary diversity","High biodiversity intactness",
+          "Low human footprint","Low biome to anthrome change","High climatic stability","Low forest cover change",
+          "High land-use stability","High carbon storage","High vulnerable carbon","High irreplaceable carbon","Large size")
 Vals <- c(rep(1,13))
 ValsII <- c(rep(1,13))
 Fake_data <- as.data.frame(cbind(Variables,Vals,ValsII))
-Fake_data$Variables <- factor(Fake_data$Variables, levels = c("High SR","High SE","High ED","High BII",
-                                                    "Low HFP","Low BTAC","High CS","Low FCC","High LUS","High CaS",
-                                                    "High VCaS","High ICaS","Large size"))
+Fake_data$Variables <- factor(Fake_data$Variables, levels = c("High species richness","High species endemism","High evolutionary diversity","High biodiversity intactness",
+                                                              "Low human footprint","Low biome to anthrome change","High climatic stability","Low forest cover change","High land-use stability",
+                                                              "High carbon storage","High vulnerable carbon","High irreplaceable carbon","Large size"))
 
 ## ggplot to extract legend from for final plot
 In <- ggplot(data = Fake_data, aes(Vals, ValsII, color = Variables)) +
   geom_point() +
-  scale_color_manual(values = c("High SR" = "darkgreen",
-                                "High SE" = "forestgreen",
-                                "High ED" = "chartreuse3",
-                                "High BII" = "tomato2",
-                                "Low HFP" = "hotpink1",
-                                "Low BTAC" = "lightpink1",
-                                "High CS" = "orange",
-                                "Low FCC" = "gold",
-                                "High LUS" = "peru",
-                                "High CaS" = "dodgerblue4",
-                                "High VCaS" = "dodgerblue2",
-                                "High ICaS" = "skyblue1",
+  scale_color_manual(values = c("High species richness" = "darkgreen",
+                                "High species endemism" = "forestgreen",
+                                "High evolutionary diversity" = "chartreuse3",
+                                "High biodiversity intactness" = "tomato2",
+                                "Low human footprint" = "hotpink1",
+                                "Low biome to anthrome change" = "lightpink1",
+                                "High climatic stability" = "orange",
+                                "Low forest cover change" = "gold",
+                                "High land-use stability" = "peru",
+                                "High carbon storage" = "dodgerblue4",
+                                "High vulnerable carbon" = "dodgerblue2",
+                                "High irreplaceable carbon" = "skyblue1",
                                 "Large size" = "saddlebrown")) +
   guides(color = guide_legend(override.aes = list(linetype = 0, size=8))) +
   theme(legend.key.size = unit(1,"point"), #change legend key size
@@ -377,7 +379,7 @@ plot(CombGlobal)
 
 #-#-# Save the final PCA plot #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
-ggsave("PCA Legacy Landscapes Conservation Objectives.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
+ggsave("PCA Legacy Landscapes Conservation Objectives_full names.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
 
 
 #--------------------     # Supplemantary plot - Scree plots #---------------------------------#
