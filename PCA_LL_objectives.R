@@ -12,9 +12,9 @@ rm(list=ls())
 
 #-#-# Load libraries #-#-#
 library(devtools) 
-library(ggbiplot) 
+#library(ggbiplot) 
 library(factoextra)
-library(easystats)
+#library(easystats)
 library(tidyverse)
 library(ggplot2)
 library(ggfortify)
@@ -126,18 +126,29 @@ fviz_eig(PA.pca.cl)
 pal <- colorRampPalette(c("steelblue3","orange3","navajowhite3","darkolivegreen3","plum4","brown"))
 colour <- pal(6)
 
-GlobalScatter <- fviz_pca_ind(PA.pca.cl, pointsize = 4,
-                              label="none", 
+
+# fviz_pca_var(Neotropic.pca, labelsize = 8, repel = TRUE, 
+#              col.var=List, palette = colour) +
+
+
+GlobalScatter <- fviz_pca_biplot(PA.pca.cl, pointsize = 4,
+                              label="var", 
+                              repel = TRUE, 
+                              labelsize = 8,
                               habillage=PCAdata$Realm,
                               palette=colour,
+                              col.var="black",
                               alpha = 0.6) +
+  coord_equal() +
   scale_shape_manual(values=c(18,18,18,18,18,18)) +
-  theme(legend.position = "right") +
-  theme(text = element_text(size = 22),
-        axis.title = element_text(size = 18),
-        axis.text = element_text(size = 18),
-        plot.title = element_text(size = 22, face="bold")) +
-  ggtitle("Individual sites - PCA")
+  theme(legend.position = "none") +
+  theme(text = element_text(size = 26),
+        axis.title = element_text(size = 26),
+        axis.text = element_text(size = 26)) +
+  scale_x_continuous(limits = c(-3,6)) +
+  scale_y_continuous(limits = c(-5,3)) +
+  theme(plot.margin = unit(c(0,0,0,0), "cm")) +
+  ggtitle("")
 plot(GlobalScatter)
 
 
@@ -160,27 +171,64 @@ realms <- ggplot(realmmap) +
   theme(legend.position = "none") +
   theme(axis.text=element_blank(),
         axis.ticks=element_blank(),
-        plot.title = element_text(size = 25))+
-  theme(panel.background=element_rect(fill='white',colour="white"), # Remove the background
-        plot.title = element_text(size = 22, face="bold")) + 
+        plot.title = element_text(size = 26, hjust = 0.5))+
+  theme(panel.background=element_rect(fill='white',colour="white")) + # Remove the background
   labs(x="", y="", title="") + # Remove axis titles
-  guides(colour = guide_legend(override.aes = list(size = 8))) +
   ggtitle("Biogeographic realms")
 plot(realms) 
 
 
-#-#-# Combine the PCA sactter plot and the realmmap #-#-#  
-CombScatter <- arrangeGrob(realms,GlobalScatter,
-                          widths = c(2,2),
-                          heights = c(1.5,1),
-                          ncol = 2,
-                          nrow = 2)
-plot(CombScatter)
+#-#-# Arrange plot parts #-#-#
+## Blank plot 
+blankPlot <- ggplot()+
+             geom_blank(aes(1,1))+
+             theme(
+             plot.background = element_blank(),
+             panel.grid.major = element_blank(),
+             panel.grid.minor = element_blank(),
+             panel.border = element_blank(),
+             panel.background = element_blank(),
+             axis.title.x = element_blank(),
+             axis.title.y = element_blank(),
+             axis.text.x = element_blank(),
+             axis.text.y = element_blank(),
+             axis.ticks = element_blank(),
+             axis.line = element_blank()) 
+plot(blankPlot)
 
+## Function to extract legend from plot 
+g_legend<-function(a.gplot){
+  tmp <- ggplot_gtable(ggplot_build(a.gplot))
+  leg <- which(sapply(tmp$grobs, function(x) x$name) == "guide-box")
+  legend <- tmp$grobs[[leg]]
+  return(legend)
+}
+
+## Extract legend from scatter plot (fist draw plot with legend)
+GlobalScatterLeg <- fviz_pca_ind(PA.pca.cl, pointsize = 4,
+                              label="none", 
+                              habillage=PCAdata$Realm,
+                              palette=colour,
+                              alpha = 0.6,
+                              legend.title = "") +
+  scale_shape_manual(values=c(18,18,18,18,18,18)) +
+  theme(legend.position = "right",
+        legend.text=element_text(size=26)) 
+plot(GlobalScatterLeg)
+
+legScat <- g_legend(GlobalScatterLeg)
+plot(legScat)
+
+
+#-#-# Combine the PCA scatter plot and the realmmap #-#-#  
+CombMap <- plot_grid(blankPlot,realms,legScat,blankPlot,ncol = 1)
+CombScatter <- plot_grid(GlobalScatter,CombMap, rel_widths = c(2, 1))
+
+plot(CombScatter)
 
 #-#-# Save the final PCA scatter plot #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
-ggsave("PCA Legacy Landscapes scatter realms.tiff",CombScatter,width=25, height=10, unit="in", dpi=300, bg="white")
+ggsave("PCA Legacy Landscapes scatter realms resize rescale.tiff",CombScatter,width=20, height=15, unit="in", dpi=600, bg="white")
 
 
 
@@ -237,10 +285,10 @@ str(Indomalaya.pca)
 ## PCA axis plots (dimension 1 and 2) 
 
 ## Set colours for the "variables" (colour loadings of the PCA) by variables
-pal <- colorRampPalette(c("tomato2", "dodgerblue4", "orange", "chartreuse3", "skyblue1",
+palVar <- colorRampPalette(c("tomato2", "dodgerblue4", "orange", "chartreuse3", "skyblue1",
                           "peru", "forestgreen", "darkgreen", "dodgerblue2",
                           "saddlebrown", "lightpink1", "gold", "hotpink1"))
-colour <- pal(13)
+colourVar <- palVar(13)
 
 ## List variable names to colour plot by
 List <- c("High SR","High SE","High ED","High BII",
@@ -250,72 +298,72 @@ List <- c("High SR","High SE","High ED","High BII",
 
 ## Global PCA plot with coloured loadings
 Global <- fviz_pca_var(PA.pca.cl, labelsize = 8, repel = TRUE,
-                       col.var=List, palette = colour) +
-          theme(axis.title = element_text(size = 20),
-          axis.text = element_text(size = 16),
-          plot.title = element_text(size = 22, face="bold"),
+                       col.var=List, palette = colourVar) +
+          theme(axis.title = element_text(size = 24),
+          axis.text = element_text(size = 20),
+          plot.title = element_text(size = 26),
           legend.position = "none") +
-          ggtitle("Global")
+          ggtitle("a) Global")
 plot(Global)
 
 ## Nearctic PCA plot with coloured loadings
 Nearctic <- fviz_pca_var(Nearctic.pca, labelsize = 8, repel = TRUE,
-                         col.var=List, palette = colour) +
-        theme(axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(size = 22, face="bold"),
+                         col.var=List, palette = colourVar) +
+        theme(axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 26),
         legend.position = "none") +
-  ggtitle("Nearctic")
+  ggtitle("b) Nearctic")
 plot(Nearctic)
 
 ## Palearctic PCA plot with coloured loadings
 Palearctic <- fviz_pca_var(Palearctic.pca, labelsize = 8, repel = TRUE,
-                           col.var=List, palette = colour) +
-        theme(axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(size = 22, face="bold"),
+                           col.var=List, palette = colourVar) +
+        theme(axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 26),
         legend.position = "none") +
-  ggtitle("Palearctic")
+  ggtitle("c) Palearctic")
 plot(Palearctic)
 
 ## Neotropic PCA plot with coloured loadings
 Neotropic <- fviz_pca_var(Neotropic.pca, labelsize = 8, repel = TRUE, 
-                          col.var=List, palette = colour) +
-        theme(axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(size = 22, face="bold"),
+                          col.var=List, palette = colourVar) +
+        theme(axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 26),
         legend.position = "none") +
-  ggtitle("Neotropic")
+  ggtitle("e) Neotropic")
 plot(Neotropic)
 
 ## Afrotropic PCA plot with coloured loadings
 Afrotropic <- fviz_pca_var(Afrotropic.pca, labelsize = 8, repel = TRUE,
-                           col.var=List, palette = colour) +
-        theme(axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(size = 22, face="bold"),
+                           col.var=List, palette = colourVar) +
+        theme(axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 26),
         legend.position = "none") +
-  ggtitle("Afrotropic")
+  ggtitle("f) Afrotropic")
 plot(Afrotropic)
 
 ## Australasia PCA plot with coloured loadings
 Australasia <- fviz_pca_var(Australasia.pca, labelsize = 8, repel = TRUE,
-                            col.var=List, palette = colour) +
-        theme(axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(size = 22, face="bold"),
+                            col.var=List, palette = colourVar) +
+        theme(axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 26),
         legend.position = "none") +
-  ggtitle("Australasia")
+  ggtitle("g) Australasia")
 plot(Australasia)
 
 ## Indomalaya PCA plot with coloured loadings
 Indomalaya <- fviz_pca_var(Indomalaya.pca, labelsize = 8, repel = TRUE,
-                           col.var=List, palette = colour) +
-        theme(axis.title = element_text(size = 20),
-        axis.text = element_text(size = 16),
-        plot.title = element_text(size = 22, face="bold"),
+                           col.var=List, palette = colourVar) +
+        theme(axis.title = element_text(size = 24),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 26),
         legend.position = "none") +
-  ggtitle("Indomalaya")
+  ggtitle("d) Indomalaya")
 plot(Indomalaya)
 
 
@@ -331,38 +379,38 @@ g_legend<-function(a.gplot){
 ## Create simple dataframe containing the list of variable names to be displayed in legend
 #c("High SR","High SE","High ED","High BII","Low HFP","Low BTAC","High CS",
 #  "Low FCC","High LUS","High CaS","High VCaS","High ICaS","Large size"))
-Variables <- c("High species richness","High species endemism","High evolutionary diversity","High biodiversity intactness",
-          "Low human footprint","Low biome to anthrome change","High climatic stability","Low forest cover change",
-          "High land-use stability","High carbon storage","High vulnerable carbon","High irreplaceable carbon","Large size")
+Variables <- c("High species richness (SR)","High species endemism (SE)","High evolutionary diversity (ED)","High biodiversity intactness (BII)",
+          "Low human footprint (HFP)","Low biome to anthrome change (BTAC)","High climatic stability (CS)","Low forest cover change (FCC)",
+          "High land-use stability (LUS)","High carbon storage (CaS)","High vulnerable carbon (VCaS)","High irreplaceable carbon (ICaS)","Large size")
 Vals <- c(rep(1,13))
 ValsII <- c(rep(1,13))
 Fake_data <- as.data.frame(cbind(Variables,Vals,ValsII))
-Fake_data$Variables <- factor(Fake_data$Variables, levels = c("High species richness","High species endemism","High evolutionary diversity","High biodiversity intactness",
-                                                              "Low human footprint","Low biome to anthrome change","High climatic stability","Low forest cover change","High land-use stability",
-                                                              "High carbon storage","High vulnerable carbon","High irreplaceable carbon","Large size"))
+Fake_data$Variables <- factor(Fake_data$Variables, levels = c("High species richness (SR)","High species endemism (SE)","High evolutionary diversity (ED)","High biodiversity intactness (BII)",
+                                                              "Low human footprint (HFP)","Low biome to anthrome change (BTAC)","High climatic stability (CS)","Low forest cover change (FCC)","High land-use stability (LUS)",
+                                                              "High carbon storage (CaS)","High vulnerable carbon (VCaS)","High irreplaceable carbon (ICaS)","Large size"))
 
 ## ggplot to extract legend from for final plot
 In <- ggplot(data = Fake_data, aes(Vals, ValsII, color = Variables)) +
   geom_point() +
-  scale_color_manual(values = c("High species richness" = "darkgreen",
-                                "High species endemism" = "forestgreen",
-                                "High evolutionary diversity" = "chartreuse3",
-                                "High biodiversity intactness" = "tomato2",
-                                "Low human footprint" = "hotpink1",
-                                "Low biome to anthrome change" = "lightpink1",
-                                "High climatic stability" = "orange",
-                                "Low forest cover change" = "gold",
-                                "High land-use stability" = "peru",
-                                "High carbon storage" = "dodgerblue4",
-                                "High vulnerable carbon" = "dodgerblue2",
-                                "High irreplaceable carbon" = "skyblue1",
+  scale_color_manual(values = c("High species richness (SR)" = "darkgreen",
+                                "High species endemism (SE)" = "forestgreen",
+                                "High evolutionary diversity (ED)" = "chartreuse3",
+                                "High biodiversity intactness (BII)" = "tomato2",
+                                "Low human footprint (HFP)" = "hotpink1",
+                                "Low biome to anthrome change (BTAC)" = "lightpink1",
+                                "High climatic stability (CS)" = "orange",
+                                "Low forest cover change (FCC)" = "gold",
+                                "High land-use stability (LUS)" = "peru",
+                                "High carbon storage (CaS)" = "dodgerblue4",
+                                "High vulnerable carbon (VCaS)" = "dodgerblue2",
+                                "High irreplaceable carbon (ICaS)" = "skyblue1",
                                 "Large size" = "saddlebrown")) +
   guides(color = guide_legend(override.aes = list(linetype = 0, size=8))) +
   theme(legend.key.size = unit(1,"point"), #change legend key size
         #legend.key.height = unit(1, 'cm'), #change legend key height
         #legend.key.width = unit(1, 'cm'), #change legend key width
-        legend.title = element_text(size=22), #change legend title font size
-        legend.text = element_text(size=20)) #change legend text font size
+        legend.title = element_text(size=24), #change legend title font size
+        legend.text = element_text(size=22)) #change legend text font size
   
 ScatterLegend <- g_legend(In)
 plot(ScatterLegend)
@@ -376,13 +424,17 @@ CombGlobal <- arrangeGrob(Global,Nearctic,Palearctic,Indomalaya,ScatterLegend,Ne
                         nrow = 2)
 plot(CombGlobal)
 
+CombGlobal <- plot_grid(Global,Nearctic,Palearctic,Indomalaya,ScatterLegend,Neotropic,Afrotropic,Australasia,
+                          ncol = 4, nrow = 2)
+plot(CombGlobal)
+
 
 #-#-# Save the final PCA plot #-#-#
 setwd("/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Legacy_landscapes_analysis/Result_plots/")
-ggsave("PCA Legacy Landscapes Conservation Objectives_full names.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
+ggsave("PCA Legacy Landscapes Conservation Objectives_full_names_Abrev_labelled.tiff",CombGlobal,width=25, height=15, unit="in", dpi=300, bg="white")
 
 
-#--------------------     # Supplemantary plot - Scree plots #---------------------------------#
+#--------------------     # Supplementary plot - Scree plots #---------------------------------#
 #-#_# Simple realm map #-#-#
 ## Set the file paths 
 realmpath <- "/Users/alkevoskamp/AG BGFM Dropbox/Voskamp/Legacy Landscapes/Site selection analysis/Other files/Realms and Regions/CMEC regions & realms/WWF_Realms_gridded_05.Rdata"
